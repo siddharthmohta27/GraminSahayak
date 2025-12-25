@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraminSahayak - Financial Literacy for Rural India</title>
+    <!-- FontAwesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Tailwind CSS for App Interface -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* --- CUSTOM STYLES FOR LANDING PAGE --- */
+        :root {
+            --primary: #e67e22; /* Earthy Orange */
+            --secondary: #27ae60; /* Crop Green */
+            --glass: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Background */
+        .bg-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), 
+                        url('https://images.unsplash.com/photo-1595245842247-5c5cb634351b?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+        }
+
+        /* Landing Page Specific Classes */
+        .landing-nav {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .landing-hero h1 {
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            animation: fadeInDown 1s ease;
+        }
+
+        .landing-hero p {
+            animation: fadeInUp 1s ease 0.3s backwards;
+        }
+
+        .landing-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: 0.4s;
+        }
+        .landing-card:hover {
+            transform: translateY(-10px);
+            background: white;
+        }
+
+        .icon-box {
+            width: 70px;
+            height: 70px;
+            background: rgba(39, 174, 96, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px auto;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+        .modal.active { display: flex; }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* App Interface transitions */
+        #app-interface {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Mic Animation */
+        .mic-active {
+            animation: pulse-red 1.5s infinite;
+            background-color: #fee2e2 !important;
+            color: #ef4444 !important;
+            border-color: #fca5a5 !important;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Background Image -->
+    <div class="bg-container"></div>
+
+    <!-- Navigation -->
+    <nav class="landing-nav fixed w-full z-50 flex justify-between items-center px-6 py-4">
+        <div class="text-2xl font-bold text-white flex items-center gap-2 cursor-pointer" onclick="showLanding()">
+            <i class="fas fa-seedling text-orange-500"></i> GraminSahayak
+        </div>
+        <ul class="hidden md:flex gap-8 list-none items-center text-white font-medium">
+            <li><a href="#" onclick="showLanding()" class="hover:text-orange-400 transition">Home</a></li>
+            <li><a href="#" onclick="launchApp('translator')" class="hover:text-orange-400 transition">Translator</a></li>
+            <li><a href="#" onclick="launchApp('chatbot')" class="hover:text-orange-400 transition">Sahayak Bot</a></li>
+            <li><a href="#" onclick="launchApp('blog')" class="hover:text-orange-400 transition">Blog</a></li>
+            <li><button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-full transition shadow-lg" onclick="toggleModal('loginModal')">Login</button></li>
+        </ul>
+    </nav>
+
+    <!-- === LANDING PAGE SECTION === -->
+    <section id="landing-page" class="min-h-screen flex flex-col justify-center items-center text-center pt-20 px-4">
+        <div class="landing-hero text-white max-w-4xl mx-auto">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6">Empowering Rural India</h1>
+            <p class="text-xl md:text-2xl mb-10 opacity-90 leading-relaxed max-w-2xl mx-auto">
+                Break the language barrier. Master your finances. <br>
+                Real-time translation and AI financial advice in your local dialect.
+            </p>
+            
+            <div class="flex flex-wrap justify-center gap-4 mb-16">
+                <button onclick="launchApp('translator')" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold text-lg transition border-2 border-green-600">
+                    Launch App
+                </button>
+                <button onclick="toggleModal('loginModal')" class="bg-transparent hover:bg-white hover:text-green-600 text-white px-8 py-3 rounded-lg font-bold text-lg transition border-2 border-white">
+                    Login
+                </button>
+            </div>
+
+            <!-- Features -->
+            <div class="flex flex-wrap justify-center gap-8 pb-10">
+                <div class="landing-card p-8 rounded-2xl w-80 text-center cursor-pointer" onclick="launchApp('translator')">
+                    <div class="icon-box"><i class="fas fa-language text-3xl text-green-600"></i></div>
+                    <h3 class="text-xl font-bold mb-2 text-slate-800">Voice Translator</h3>
+                    <p class="text-slate-600">English to Haryanvi, Bhojpuri, & Tamil with voice support.</p>
+                </div>
+
+                <div class="landing-card p-8 rounded-2xl w-80 text-center cursor-pointer" onclick="launchApp('chatbot')">
+                    <div class="icon-box"><i class="fas fa-robot text-3xl text-green-600"></i></div>
+                    <h3 class="text-xl font-bold mb-2 text-slate-800">Sahayak Bot</h3>
+                    <p class="text-slate-600">AI Assistant. Ask about loans, schemes, and farming.</p>
+                </div>
+
+                <div class="landing-card p-8 rounded-2xl w-80 text-center cursor-pointer" onclick="launchApp('blog')">
+                    <div class="icon-box"><i class="fas fa-book-reader text-3xl text-green-600"></i></div>
+                    <h3 class="text-xl font-bold mb-2 text-slate-800">Literacy Blog</h3>
+                    <p class="text-slate-600">Simple guides on saving money and avoiding scams.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- === APP INTERFACE SECTION (Hidden by default) === -->
+    <section id="app-interface" class="min-h-screen pt-24 pb-10 px-4 md:px-6">
+        <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[600px] flex flex-col">
+            
+            <!-- App Header -->
+            <div id="app-header" class="bg-orange-600 p-4 text-white flex flex-col md:flex-row justify-between items-center gap-4 transition-colors duration-500">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 p-2 rounded-lg"><i class="fas fa-language text-xl"></i></div>
+                    <div>
+                        <h2 class="text-2xl font-bold">GraminSahayak</h2>
+                        <p class="text-xs opacity-90" id="ai-status">Checking Connection...</p>
+                    </div>
+                </div>
+                
+                <div class="flex gap-2 items-center">
+                    <!-- Language Selector -->
+                    <div class="relative">
+                        <select id="language-select" onchange="changeLanguage()" class="appearance-none bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-xl py-2 pl-4 pr-10 font-medium cursor-pointer focus:outline-none w-40">
+                            <option value="haryanvi" class="text-slate-900">Haryanvi</option>
+                            <option value="bhojpuri" class="text-slate-900">Bhojpuri</option>
+                            <option value="tamil" class="text-slate-900">Tamil</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-3 text-sm pointer-events-none opacity-80"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mode Tabs -->
+            <div class="p-4 bg-slate-50 border-b border-slate-200">
+                <div class="bg-white p-1 rounded-xl shadow-sm border border-slate-200 flex">
+                    <button id="tab-translator" onclick="switchTab('translator')" class="flex-1 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors bg-orange-50 text-orange-600">
+                        <i class="fas fa-exchange-alt"></i> Translator
+                    </button>
+                    <button id="tab-chatbot" onclick="switchTab('chatbot')" class="flex-1 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors text-slate-500 hover:bg-slate-50">
+                        <i class="fas fa-robot"></i> Sahayak Bot
+                    </button>
+                    <button id="tab-blog" onclick="switchTab('blog')" class="flex-1 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors text-slate-500 hover:bg-slate-50">
+                        <i class="fas fa-book-reader"></i> Blog
+                    </button>
+                </div>
+            </div>
+
+            <!-- TRANSLATOR VIEW -->
+            <div id="view-translator" class="flex-1 flex flex-col">
+                <div class="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100 flex-1">
+                    
+                    <!-- Input -->
+                    <div class="p-6 relative flex flex-col">
+                        <div class="flex justify-between mb-2 text-sm font-bold text-slate-500">
+                            <span id="label-source">English</span>
+                            <button onclick="toggleDirection()" class="hover:text-orange-600"><i class="fas fa-exchange-alt"></i></button>
+                            <span id="label-target">Haryanvi</span>
+                        </div>
+                        <textarea id="input-text" class="w-full flex-1 resize-none text-lg border-none focus:ring-0 outline-none placeholder-slate-300 bg-transparent" placeholder="Type here (e.g., 'Money for seeds')..."></textarea>
+                        <div class="flex justify-between items-center mt-4">
+                            <button id="mic-translator" onclick="startVoiceTranslation()" class="p-3 bg-slate-100 rounded-full hover:bg-slate-200 text-slate-500 transition border border-transparent"><i class="fas fa-microphone"></i></button>
+                            <button onclick="document.getElementById('input-text').value=''" class="text-xs text-slate-400 hover:text-red-500">Clear</button>
+                        </div>
+                    </div>
+
+                    <!-- Output -->
+                    <div class="p-6 relative bg-slate-50/50 flex flex-col">
+                        <div id="output-text" class="flex-1 text-2xl font-medium text-slate-800 leading-relaxed overflow-y-auto flex items-center justify-center text-center">
+                            <div class="text-slate-300"><i class="fas fa-magic text-2xl mb-2 block"></i>Translation</div>
+                        </div>
+                        <div class="flex justify-end mt-4">
+                            <button onclick="speakOutput()" class="p-3 bg-white border border-slate-200 rounded-full hover:bg-slate-50 text-slate-600 shadow-sm"><i class="fas fa-volume-up"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-center">
+                    <button onclick="handleTranslate()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-10 rounded-xl shadow-lg transform active:scale-95 transition flex items-center gap-2">
+                        <span>Translate</span> <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Quick Phrases -->
+                <div class="p-6 bg-white border-t border-slate-100">
+                    <h3 class="text-sm font-bold text-slate-500 mb-3"><i class="fas fa-book mr-1"></i> Quick Phrases</h3>
+                    <div class="flex flex-wrap gap-2" id="quick-phrases">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHATBOT VIEW (Hidden default) -->
+            <div id="view-chatbot" class="hidden flex-1 flex flex-col h-[500px]">
+                <div id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+                    <!-- Messages will appear here -->
+                    <div class="flex justify-start">
+                        <div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none text-sm shadow-sm max-w-[80%]">
+                            Namaste! I am Sahayak. Ask me about loans, banks, or schemes.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-white border-t border-slate-200">
+                    <div class="flex gap-2 items-center">
+                        <button id="mic-chatbot" onclick="startVoiceChat()" class="bg-slate-100 text-slate-500 p-3 rounded-xl hover:bg-slate-200 transition border border-transparent"><i class="fas fa-microphone"></i></button>
+                        <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 bg-slate-100 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-200 outline-none" onkeydown="if(event.key === 'Enter') handleChat()">
+                        <button onclick="handleChat()" class="bg-orange-600 text-white p-3 rounded-xl hover:bg-orange-700 transition shadow-md"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                    <div class="flex gap-2 mt-3 overflow-x-auto no-scrollbar pb-1">
+                        <button onclick="setChat('I need a loan')" class="whitespace-nowrap px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-full text-xs text-slate-600 border border-slate-200">I need a loan</button>
+                        <button onclick="setChat('Government schemes')" class="whitespace-nowrap px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-full text-xs text-slate-600 border border-slate-200">Government schemes</button>
+                        <button onclick="setChat('Subsidy for seeds')" class="whitespace-nowrap px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-full text-xs text-slate-600 border border-slate-200">Subsidy for seeds</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BLOG VIEW (Hidden default) -->
+            <div id="view-blog" class="hidden flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50 h-[500px]">
+                <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <i class="fas fa-newspaper text-orange-600"></i> Financial Literacy Corner
+                </h2>
+                
+                <!-- Blog Post 1 -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 mb-6 transition hover:shadow-md">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg text-slate-800">Understanding KCC (Kisan Credit Card)</h3>
+                        <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">Loans</span>
+                    </div>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                        KCC offers loans to farmers at a very low interest rate of 7%. If you repay on time, you get an extra 3% subsidy, making the effective interest rate only 4%. Do not take loans from local moneylenders at high rates.
+                    </p>
+                    <div class="flex items-center gap-4 border-t border-slate-100 pt-3">
+                        <button onclick="toggleLike(this)" class="flex items-center gap-1 text-slate-500 hover:text-red-500 text-sm transition group">
+                            <i class="far fa-heart group-hover:animate-bounce"></i> <span>Like</span>
+                        </button>
+                        <div class="flex items-center gap-1 bg-slate-100 rounded-lg px-2 py-1">
+                            <button onclick="vote(this, 1)" class="text-slate-400 hover:text-orange-600 transition"><i class="fas fa-arrow-up"></i></button>
+                            <span class="text-xs font-bold text-slate-700 w-6 text-center">124</span>
+                            <button onclick="vote(this, -1)" class="text-slate-400 hover:text-orange-600 transition"><i class="fas fa-arrow-down"></i></button>
+                        </div>
+                        <button onclick="alert('Comments section coming soon!')" class="flex items-center gap-1 text-slate-500 hover:text-blue-500 text-sm transition ml-auto">
+                            <i class="far fa-comment"></i> <span>Comment</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Blog Post 2 -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 mb-6 transition hover:shadow-md">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg text-slate-800">Beware of OTP Scams</h3>
+                        <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">Security</span>
+                    </div>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                        Bank officers never ask for your PIN or OTP over the phone. If someone calls claiming to be from the bank and asks for your password to "update KYC", cut the call immediately. It is a fraud attempt.
+                    </p>
+                    <div class="flex items-center gap-4 border-t border-slate-100 pt-3">
+                        <button onclick="toggleLike(this)" class="flex items-center gap-1 text-slate-500 hover:text-red-500 text-sm transition group">
+                            <i class="far fa-heart group-hover:animate-bounce"></i> <span>Like</span>
+                        </button>
+                        <div class="flex items-center gap-1 bg-slate-100 rounded-lg px-2 py-1">
+                            <button onclick="vote(this, 1)" class="text-slate-400 hover:text-orange-600 transition"><i class="fas fa-arrow-up"></i></button>
+                            <span class="text-xs font-bold text-slate-700 w-6 text-center">89</span>
+                            <button onclick="vote(this, -1)" class="text-slate-400 hover:text-orange-600 transition"><i class="fas fa-arrow-down"></i></button>
+                        </div>
+                        <button onclick="alert('Comments section coming soon!')" class="flex items-center gap-1 text-slate-500 hover:text-blue-500 text-sm transition ml-auto">
+                            <i class="far fa-comment"></i> <span>Comment</span>
+                        </button>
+                    </div>
+                </div>
+                
+                 <!-- Blog Post 3 -->
+                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 mb-6 transition hover:shadow-md">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-lg text-slate-800">Saving from Harvest</h3>
+                        <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">Savings</span>
+                    </div>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                        When you sell your crops, try to save at least 20% of the income in a separate bank account. This 'emergency fund' will help you buy seeds and fertilizers for the next season without taking new loans.
+                    </p>
+                    <div class="flex items-center gap-4 border-t border-slate-100 pt-3">
+                        <button onclick="toggleLike(this)" class="flex items-center gap-1 text-slate-500 hover:text-red-500 text-sm transition group">
+                            <i class="far fa-heart group-hover:animate-bounce"></i> <span>Like</span>
+                        </button>
+                        <div class="flex items-center gap-1 bg-slate-100 rounded-lg px-2 py-1">
+                            <button onclick="vote(this, 1)" class="text-slate-400 hover:text-orange-600 transition"><i class="fas fa-arrow-up"></i></button>
+                            <span class="text-xs font-bold text-slate-700 w-6 text-center">215</span>
+                            <button onclick="vote(this, -1)" class="text-slate-400 hover:text-orange-600 transition"><i class="fas fa-arrow-down"></i></button>
+                        </div>
+                        <button onclick="alert('Comments section coming soon!')" class="flex items-center gap-1 text-slate-500 hover:text-blue-500 text-sm transition ml-auto">
+                            <i class="far fa-comment"></i> <span>Comment</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div class="modal fixed inset-0 flex justify-center items-center opacity-0 pointer-events-none transition-opacity duration-300" id="loginModal">
+        <div class="bg-white p-8 rounded-2xl w-96 text-center transform scale-95 transition-transform duration-300 relative shadow-2xl">
+            <span class="absolute top-4 right-4 text-2xl cursor-pointer text-slate-400 hover:text-slate-600" onclick="toggleModal('loginModal')">&times;</span>
+            <h2 class="text-2xl font-bold mb-6 text-slate-800">Welcome Back</h2>
+            <input type="text" placeholder="Phone Number / Aadhaar" class="w-full p-3 mb-3 border border-slate-200 rounded-lg bg-slate-50 focus:outline-none focus:border-orange-500">
+            <input type="password" placeholder="PIN" class="w-full p-3 mb-4 border border-slate-200 rounded-lg bg-slate-50 focus:outline-none focus:border-orange-500">
+            <button onclick="toggleModal('loginModal'); launchApp('translator')" class="w-full py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 transition shadow-lg">Secure Login</button>
+            <p class="mt-4 text-xs text-slate-500">New User? <a href="#" class="text-orange-600 font-bold">Register with KCC</a></p>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // =================================================================
+        //  STEP 1: PASTE YOUR GOOGLE GEMINI API KEY BELOW (INSIDE QUOTES)
+        // =================================================================
+        const apiKey = ""; 
+        // Example: const apiKey = "AIzaSyD5_k9...";
+        // =================================================================
+
+        
+        const LANGUAGE_DATA = {
+            haryanvi: {
+                name: "Haryanvi", color: "orange", voice: "hi-IN", prompt: "Haryanvi (Desi dialect)",
+                dictionary: { "i": "manne", "my": "mhara", "money": "pisa", "loan": "karza", "bank": "bank", "interest": "byaaj", "scheme": "skeem", "farmer": "kisaan" },
+                phrases: ["Money for seeds", "Where is the bank?", "Interest rate", "Government scheme"]
+            },
+            bhojpuri: {
+                name: "Bhojpuri", color: "purple", voice: "hi-IN", prompt: "Bhojpuri language",
+                dictionary: { "i": "ham", "my": "hamar", "money": "paisa", "loan": "karja", "bank": "bank", "interest": "sud", "scheme": "yojna", "farmer": "kisan" },
+                phrases: ["Biya khatir paisa", "Bank kaha ba?", "Byaaj dar", "Sarkari yojna"]
+            },
+            tamil: {
+                name: "Tamil", color: "rose", voice: "ta-IN", prompt: "Tamil language",
+                dictionary: { "i": "naan", "money": "panam", "loan": "kadan", "bank": "vanki", "interest": "vatti", "scheme": "thittam", "farmer": "vivasaayi" },
+                phrases: ["Vithaigalukku panam", "Vanki enge?", "Vatti vigitham", "Arasu thittam"]
+            }
+        };
+
+        const OFFLINE_RESPONSES = {
+            default: "Offline Mode: Contact bank manager for details.",
+            keywords: { 
+                "loan": "KCC loan is best (7% interest).", 
+                "kcc": "Kisan Credit Card gives loans at low interest.",
+                "bank": "Bank opens at 10 AM. Carry Aadhaar.", 
+                "subsidy": "Check Block office for subsidy.", 
+                "money": "Keep money safe in bank.",
+                "seed": "Subsidy available for seeds at Block Office."
+            }
+        };
+
+        // --- STATE ---
+        let activeLang = 'haryanvi';
+        let direction = 'eng-to-target';
+        let currentText = "";
+        
+        // --- SPEECH RECOGNITION SETUP ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+        }
+
+        // --- UI FUNCTIONS ---
+        function showLanding() {
+            document.getElementById('landing-page').style.display = 'flex';
+            document.getElementById('app-interface').style.display = 'none';
+            window.scrollTo(0, 0);
+            updateStatus();
+        }
+
+        function launchApp(mode) {
+            document.getElementById('landing-page').style.display = 'none';
+            document.getElementById('app-interface').style.display = 'block';
+            switchTab(mode);
+            updateUI();
+            updateStatus();
+        }
+
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal.classList.contains('opacity-0')) {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modal.querySelector('div').classList.remove('scale-95');
+                modal.querySelector('div').classList.add('scale-100');
+            } else {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                modal.querySelector('div').classList.remove('scale-100');
+                modal.querySelector('div').classList.add('scale-95');
+            }
+        }
+
+        function updateStatus() {
+            const statusEl = document.getElementById('ai-status');
+            if(apiKey && apiKey.length > 5) {
+                statusEl.innerText = "Powered by Gemini AI (Online)";
+                statusEl.classList.add('text-green-200');
+            } else {
+                statusEl.innerText = "Offline Mode (Open file to add API Key)";
+                statusEl.classList.remove('text-green-200');
+            }
+        }
+
+        function switchTab(mode) {
+            const tabs = ['translator', 'chatbot', 'blog'];
+            const theme = LANGUAGE_DATA[activeLang].color;
+            
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                const view = document.getElementById(`view-${t}`);
+                
+                if (t === mode) {
+                    view.classList.remove('hidden');
+                    // Active style
+                    btn.className = `flex-1 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors bg-${theme}-50 text-${theme}-600`;
+                } else {
+                    view.classList.add('hidden');
+                    // Inactive style
+                    btn.className = 'flex-1 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors text-slate-500 hover:bg-slate-50';
+                }
+            });
+        }
+
+        function changeLanguage() {
+            activeLang = document.getElementById('language-select').value;
+            updateUI();
+        }
+
+        function updateUI() {
+            const data = LANGUAGE_DATA[activeLang];
+            const color = data.color;
+
+            // Update Header Color
+            const header = document.getElementById('app-header');
+            header.className = `p-4 text-white flex flex-col md:flex-row justify-between items-center gap-4 transition-colors duration-500 bg-${color}-600`;
+
+            // Update Labels
+            document.getElementById('label-target').innerText = data.name;
+            
+            // Update Quick Phrases
+            const phraseContainer = document.getElementById('quick-phrases');
+            phraseContainer.innerHTML = '';
+            data.phrases.forEach(p => {
+                const btn = document.createElement('button');
+                btn.className = "px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 transition";
+                btn.innerText = p;
+                btn.onclick = () => { document.getElementById('input-text').value = p; };
+                phraseContainer.appendChild(btn);
+            });
+
+            // Update Chat Greeting
+            const chatHistory = document.getElementById('chat-history');
+            if(chatHistory.children.length <= 1) {
+                chatHistory.innerHTML = `
+                <div class="flex justify-start">
+                    <div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none text-sm shadow-sm max-w-[80%]">
+                        Namaste! I am Sahayak. Ask me about loans in ${data.name}.
+                    </div>
+                </div>`;
+            }
+            
+            // Refresh Tabs to apply new color but keep current view
+            let currentTab = 'translator';
+            if(!document.getElementById('view-chatbot').classList.contains('hidden')) currentTab = 'chatbot';
+            if(!document.getElementById('view-blog').classList.contains('hidden')) currentTab = 'blog';
+            switchTab(currentTab);
+        }
+
+        function toggleDirection() {
+            direction = direction === 'eng-to-target' ? 'target-to-eng' : 'eng-to-target';
+            const s = document.getElementById('label-source');
+            const t = document.getElementById('label-target');
+            const temp = s.innerText;
+            s.innerText = t.innerText;
+            t.innerText = temp;
+            
+            document.getElementById('input-text').value = '';
+            document.getElementById('output-text').innerHTML = '<div class="text-slate-300"><i class="fas fa-magic text-2xl mb-2 block"></i>Translation</div>';
+        }
+
+        // --- BLOG INTERACTION FUNCTIONS ---
+        function toggleLike(btn) {
+            const icon = btn.querySelector('i');
+            if (icon.classList.contains('far')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas', 'text-red-500');
+                btn.classList.add('text-red-500');
+            } else {
+                icon.classList.remove('fas', 'text-red-500');
+                icon.classList.add('far');
+                btn.classList.remove('text-red-500');
+            }
+        }
+
+        function vote(btn, val) {
+            const countSpan = btn.parentElement.querySelector('span');
+            let count = parseInt(countSpan.innerText);
+            
+            // Simple toggle simulation
+            if (btn.classList.contains('text-orange-600')) {
+                btn.classList.remove('text-orange-600');
+                btn.classList.add('text-slate-400');
+                count -= val;
+            } else {
+                // Reset other button
+                const siblings = btn.parentElement.querySelectorAll('button');
+                siblings.forEach(s => {
+                   if(s !== btn && s.classList.contains('text-orange-600')) {
+                       s.classList.remove('text-orange-600');
+                       s.classList.add('text-slate-400');
+                       count -= (val * -1); // Undo other vote
+                   }
+                });
+                
+                btn.classList.remove('text-slate-400');
+                btn.classList.add('text-orange-600');
+                count += val;
+            }
+            countSpan.innerText = count;
+        }
+
+
+        // --- VOICE INPUT FUNCTIONS ---
+        function startVoiceTranslation() {
+            if (!recognition) {
+                alert("Voice input not supported in this browser. Try Chrome/Edge.");
+                return;
+            }
+            
+            const isEnglish = direction === 'eng-to-target';
+            recognition.lang = isEnglish ? 'en-US' : LANGUAGE_DATA[activeLang].voice;
+            
+            const btn = document.getElementById('mic-translator');
+            btn.classList.add('mic-active');
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('input-text').value = transcript;
+                btn.classList.remove('mic-active');
+                handleTranslate();
+            };
+
+            recognition.onerror = function(event) {
+                console.error("Speech error", event);
+                btn.classList.remove('mic-active');
+            };
+            recognition.onend = function() { btn.classList.remove('mic-active'); };
+            recognition.start();
+        }
+
+        function startVoiceChat() {
+            if (!recognition) {
+                alert("Voice input not supported in this browser. Try Chrome/Edge.");
+                return;
+            }
+            
+            recognition.lang = 'en-US'; 
+            const btn = document.getElementById('mic-chatbot');
+            btn.classList.add('mic-active');
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('chat-input').value = transcript;
+                btn.classList.remove('mic-active');
+                handleChat();
+            };
+
+            recognition.onerror = function(event) {
+                console.error("Speech error", event);
+                btn.classList.remove('mic-active');
+            };
+            recognition.onend = function() { btn.classList.remove('mic-active'); };
+            recognition.start();
+        }
+
+        // --- TRANSLATION LOGIC ---
+        async function handleTranslate() {
+            const text = document.getElementById('input-text').value.trim();
+            if(!text) return;
+            
+            const outputDiv = document.getElementById('output-text');
+            outputDiv.innerHTML = '<i class="fas fa-spinner fa-spin text-2xl text-orange-500"></i>';
+
+            const source = direction === 'eng-to-target' ? 'English' : LANGUAGE_DATA[activeLang].prompt;
+            const target = direction === 'eng-to-target' ? LANGUAGE_DATA[activeLang].prompt : 'English';
+
+            try {
+                if(!apiKey) throw new Error("No API Key");
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: `Translate "${text}" from ${source} to ${target}. Output ONLY translated text.` }] }] })
+                });
+                
+                const data = await response.json();
+                if(data.error) throw new Error(data.error.message);
+                currentText = data.candidates[0].content.parts[0].text;
+                outputDiv.innerText = currentText;
+
+            } catch (e) {
+                // Fallback Offline Logic
+                console.log("Offline Fallback:", e.message);
+                let res = text;
+                const dict = LANGUAGE_DATA[activeLang].dictionary;
+                let found = false;
+                
+                Object.keys(dict).forEach(k => {
+                    if(text.toLowerCase().includes(k)) {
+                        res = res.replace(new RegExp(k, 'gi'), dict[k]);
+                        found = true;
+                    }
+                });
+                
+                if(!found) {
+                   LANGUAGE_DATA[activeLang].phrases.forEach(p => {
+                       if (p.toLowerCase().includes(text.toLowerCase())) res = "Translated: " + p + " (Approx)";
+                   });
+                }
+                
+                if(res === text) res = "Translation unavailable offline.";
+                currentText = res;
+                outputDiv.innerText = res + " (Offline)";
+            }
+        }
+
+        // --- CHATBOT LOGIC ---
+        function setChat(txt) {
+            document.getElementById('chat-input').value = txt;
+        }
+
+        async function handleChat() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if(!text) return;
+            
+            const history = document.getElementById('chat-history');
+            const theme = LANGUAGE_DATA[activeLang].color;
+
+            // User Msg
+            history.innerHTML += `
+            <div class="flex justify-end">
+                <div class="bg-${theme}-600 text-white p-3 rounded-2xl rounded-tr-none text-sm shadow-md max-w-[80%]">
+                    ${text}
+                </div>
+            </div>`;
+            input.value = '';
+            history.scrollTop = history.scrollHeight;
+
+            // Bot Response
+            try {
+                let botText = "";
+                if(!apiKey) throw new Error("No API Key");
+
+                const systemPrompt = `You are 'Sahayak', a helpful rural financial assistant. 
+                Answer the user's question in ${LANGUAGE_DATA[activeLang].prompt}. 
+                Keep it short, simple, and friendly. 
+                User asked: ${text}`;
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
+                });
+                const data = await response.json();
+                if(data.error) throw new Error(data.error.message);
+                botText = data.candidates[0].content.parts[0].text;
+
+                history.innerHTML += `
+                <div class="flex justify-start">
+                    <div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none text-sm shadow-sm max-w-[80%]">
+                        ${botText} <br>
+                        <button onclick="speakText('${botText.replace(/'/g, "\\'")}')" class="mt-2 text-xs text-slate-400 hover:text-slate-600"><i class="fas fa-volume-up"></i> Listen</button>
+                    </div>
+                </div>`;
+
+            } catch(e) {
+                // Robust Offline fallback
+                console.log("Offline Fallback Chat:", e.message);
+                let reply = OFFLINE_RESPONSES.default;
+                
+                // Stronger keyword matching
+                const lowerText = text.toLowerCase();
+                for (const [key, value] of Object.entries(OFFLINE_RESPONSES.keywords)) {
+                    if (lowerText.includes(key)) {
+                        reply = value;
+                        break;
+                    }
+                }
+                
+                // Greeting check
+                if(lowerText.match(/\b(hi|hello|namaste)\b/)) reply = "Namaste! I am Sahayak. I can help with loans.";
+                
+                history.innerHTML += `
+                <div class="flex justify-start">
+                    <div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none text-sm shadow-sm max-w-[80%]">
+                        ${reply} (Offline)
+                    </div>
+                </div>`;
+            }
+            history.scrollTop = history.scrollHeight;
+        }
+
+        // --- SPEECH ---
+        function speakOutput() {
+            if(!currentText) return;
+            speakText(currentText);
+        }
+
+        function speakText(txt) {
+            const u = new SpeechSynthesisUtterance(txt);
+            u.lang = direction === 'eng-to-target' ? LANGUAGE_DATA[activeLang].voice : 'en-US';
+            window.speechSynthesis.speak(u);
+        }
+
+        // Initialize
+        updateUI();
+        updateStatus(); // Check key on load
+    </script>
+</body>
+</html>
